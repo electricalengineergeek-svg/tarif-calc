@@ -146,8 +146,12 @@
             };
 
             let scenario = calculateScenario(1);
-            if (monthlyConsumption > 0 && scenario.coveragePercent < 50) {
-                scenario = calculateScenario(2);
+            for (let units = 2; units <= 4; units++) {
+                if (monthlyConsumption > 0 && scenario.coveragePercent < 50) {
+                    scenario = calculateScenario(units);
+                } else {
+                    break;
+                }
             }
 
             const projection = buildProjection(scenario.totalInvestment, scenario.firstYearAnnualSavings, 30);
@@ -157,8 +161,8 @@
             document.getElementById('annualSavings').innerText = formatMoney(scenario.firstYearAnnualSavings);
             document.getElementById('shiftCoverage').innerText = Math.min(scenario.coveragePercent, 100).toFixed(1);
             document.getElementById('batteryUnits').innerText = scenario.batteryUnits;
-            document.getElementById('coverageHint').innerText = scenario.batteryUnits === 2
-                ? 'Покриття з 1 АКБ було менше 50%, тому автоматично додано 2-й АКБ.'
+            document.getElementById('coverageHint').innerText = scenario.batteryUnits > 1
+                ? `Покриття з 1 АКБ було менше 50%, тому автоматично додано ${scenario.batteryUnits} АКБ.`
                 : '';
 
             renderChart(scenario.totalInvestment, projection.cumulativeSavingsSeries, projection.labels);
@@ -194,7 +198,6 @@
         function renderChart(totalInvestment, cumulativeSavingsSeries, labels) {
             const ctx = document.getElementById('roiChart').getContext('2d');
             const investmentLine = Array(labels.length).fill(totalInvestment);
-            const netSeries = cumulativeSavingsSeries.map((value) => value - totalInvestment);
 
             if (myChart) {
                 myChart.destroy();
@@ -223,15 +226,6 @@
                             fill: true,
                             tension: 0.3,
                             pointBackgroundColor: '#eab308'
-                        },
-                        {
-                            label: 'Баланс (економія - інвестиції), грн',
-                            data: netSeries,
-                            borderColor: '#14b8a6',
-                            borderWidth: 2,
-                            fill: false,
-                            tension: 0.3,
-                            pointRadius: 0
                         }
                     ]
                 },
