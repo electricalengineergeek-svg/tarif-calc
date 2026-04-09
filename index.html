@@ -12,10 +12,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Калькулятор окупності сонячних панелей ☀️</title>
-    <meta name="description" content="Безкоштовний онлайн калькулятор для розрахунку терміну окупності сонячної електростанції для дому.">
-    <meta property="og:title" content="Сонячний Калькулятор | Trust me, I am an engineer">
-    <meta property="og:description" content="Дізнайтеся, коли ваша СЕС почне приносити реальний прибуток.">
+    <title>Калькулятор окупності АКБ + гібридний інвертор</title>
+    <meta name="description" content="Онлайн калькулятор окупності гібридного інвертора та акумулятора при нічному заряді і денному споживанні.">
+    <meta property="og:title" content="Калькулятор АКБ + інвертор | Trust me, I am an engineer">
+    <meta property="og:description" content="Оцініть, як швидко окупиться система нічний тариф -> АКБ -> денне навантаження.">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,8 +24,8 @@
 
     <div class="max-w-4xl mx-auto p-6">
         <header class="text-center mb-10">
-            <h1 class="text-4xl font-extrabold text-yellow-600 tracking-tight">Solar ROI Visualizer</h1>
-            <p class="text-gray-500 mt-2">Інженерний розрахунок повернення інвестицій</p>
+            <h1 class="text-4xl font-extrabold text-yellow-600 tracking-tight">Hybrid Battery ROI Visualizer</h1>
+            <p class="text-gray-500 mt-2">Окупність: нічний заряд АКБ, денне споживання</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -33,20 +33,32 @@
             <div class="lg:col-span-1 bg-white shadow-xl rounded-2xl p-6 border border-gray-100 h-fit">
                 <div class="grid gap-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Вартість системи ($)</label>
-                        <input type="number" id="cost" value="5000" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                        <label class="block text-sm font-semibold mb-1">Місячне споживання (кВт·год)</label>
+                        <input type="number" id="monthlyConsumption" value="300" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Споживання (кВт·год/міс)</label>
-                        <input type="number" id="consumption" value="300" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                        <label class="block text-sm font-semibold mb-1">Денний тариф (грн/кВт·год)</label>
+                        <input type="number" id="dayTariff" value="4.32" step="0.01" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Тариф (грн/кВт·год)</label>
-                        <input type="number" id="tariff" value="4.32" step="0.01" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                        <label class="block text-sm font-semibold mb-1">Нічний тариф (грн/кВт·год)</label>
+                        <input type="number" id="nightTariff" value="2.16" step="0.01" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Курс валют (грн/$)</label>
-                        <input type="number" id="rate" value="40" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                        <label class="block text-sm font-semibold mb-1">Вартість інвертора (грн)</label>
+                        <input type="number" id="inverterCost" value="48000" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Вартість АКБ (грн)</label>
+                        <input type="number" id="batteryCost" value="67000" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Монтаж і додаткові роботи (грн)</label>
+                        <input type="number" id="installCost" value="7000" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Корисна ємність АКБ (кВт·год)</label>
+                        <input type="number" id="batteryCapacity" value="6.14" step="0.01" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <button onclick="updateDashboard()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg active:scale-95">
                         Оновити розрахунок
@@ -58,6 +70,11 @@
                 <div id="result-text" class="mb-8 border-b pb-4">
                     <p class="text-gray-500 uppercase text-xs font-bold tracking-widest">Прогноз окупності</p>
                     <p class="text-4xl font-black text-gray-900"><span id="years">0</span> <span class="text-lg font-medium text-gray-500">років</span></p>
+                    <p class="text-sm text-gray-500 mt-2">Місячна економія: <span id="monthlySavings">0</span> грн</p>
+                    <p class="text-sm text-gray-500">Річна економія (1-й рік): <span id="annualSavings">0</span> грн</p>
+                    <p class="text-sm text-gray-500">АКБ у розрахунку: <span id="batteryUnits">1</span> шт</p>
+                    <p class="text-sm text-gray-500">Покриття місячного споживання з АКБ: <span id="shiftCoverage">0</span>%</p>
+                    <p id="coverageHint" class="text-sm text-amber-600 mt-1"></p>
                 </div>
                 
                 <div class="relative h-[350px]">
@@ -68,48 +85,119 @@
         </div>
 
         <footer class="mt-12 text-center text-gray-400 text-sm">
-            <p>© 2026 Trust me, I am an engineer. Побудовано з використанням Chart.js та Tailwind.</p>
+            <p>© 2026 Trust me, I am an engineer. Модель враховує лише економію на різниці тарифів і не є фінансовою консультацією.</p>
+            <p class="mt-1">Дефолтні ціни орієнтовані на комплект Deye SUN-6k-SG05LP1-EU + RW-M6.1 (станом на квітень 2026).</p>
+            <p class="mt-1">У поточній версії не враховуються деградація АКБ та сервісне обслуговування. Також прийнято 1 цикл на добу і 100% ККД.</p>
         </footer>
     </div>
 
     <script>
         let myChart = null;
 
+        function clampNumber(value, min = 0) {
+            if (!Number.isFinite(value)) {
+                return min;
+            }
+
+            return Math.max(value, min);
+        }
+
+        function formatMoney(value) {
+            return value.toLocaleString('uk-UA', {
+                maximumFractionDigits: 0
+            });
+        }
+
         function updateDashboard() {
             // Подія для Google Analytics
             if (typeof gtag === 'function') {
                 gtag('event', 'calculate_click', {
                     'event_category': 'engagement',
-                    'event_label': 'Solar Calculation'
+                    'event_label': 'Battery Arbitrage Calculation'
                 });
             }
 
-            // Отримуємо значення з полів
-            const costUsd = parseFloat(document.getElementById('cost').value) || 0;
-            const monthlyKwh = parseFloat(document.getElementById('consumption').value) || 0;
-            const tariff = parseFloat(document.getElementById('tariff').value) || 0;
-            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            // Отримуємо і нормалізуємо вхідні дані
+            const inverterCost = clampNumber(parseFloat(document.getElementById('inverterCost').value));
+            const batteryCost = clampNumber(parseFloat(document.getElementById('batteryCost').value));
+            const installCost = clampNumber(parseFloat(document.getElementById('installCost').value));
+            const batteryCapacity = clampNumber(parseFloat(document.getElementById('batteryCapacity').value));
+            const monthlyConsumption = clampNumber(parseFloat(document.getElementById('monthlyConsumption').value));
+            const dayTariff = clampNumber(parseFloat(document.getElementById('dayTariff').value));
+            const nightTariff = clampNumber(parseFloat(document.getElementById('nightTariff').value));
+            const calculateScenario = (batteryUnits) => {
+                const totalInvestment = inverterCost + installCost + (batteryCost * batteryUnits);
+                const maxShiftedMonthlyKwh = batteryCapacity * 30 * batteryUnits;
+                const shiftedMonthlyKwh = Math.min(monthlyConsumption, maxShiftedMonthlyKwh);
+                const gridNightKwhForCharge = shiftedMonthlyKwh;
+                const costWithoutSystemMonthly = monthlyConsumption * dayTariff;
+                const costWithSystemMonthly = (monthlyConsumption - shiftedMonthlyKwh) * dayTariff + (gridNightKwhForCharge * nightTariff);
+                const monthlySavings = costWithoutSystemMonthly - costWithSystemMonthly;
+                const firstYearAnnualSavings = monthlySavings * 12;
+                const coveragePercent = monthlyConsumption > 0 ? (shiftedMonthlyKwh / monthlyConsumption) * 100 : 0;
 
-            const costGrn = costUsd * rate;
-            const annualSavings = monthlyKwh * 12 * tariff;
-            
-            // Розрахунок років окупності
-            const paybackYears = annualSavings > 0 ? (costGrn / annualSavings) : 0;
-            document.getElementById('years').innerText = paybackYears > 0 ? paybackYears.toFixed(1) : "—";
+                return {
+                    batteryUnits,
+                    totalInvestment,
+                    monthlySavings,
+                    firstYearAnnualSavings,
+                    coveragePercent
+                };
+            };
 
-            renderChart(costGrn, annualSavings);
+            let scenario = calculateScenario(1);
+            if (monthlyConsumption > 0 && scenario.coveragePercent < 50) {
+                scenario = calculateScenario(2);
+            }
+
+            const projection = buildProjection(scenario.totalInvestment, scenario.firstYearAnnualSavings, 15);
+
+            document.getElementById('years').innerText = projection.paybackYears ? projection.paybackYears.toFixed(1) : "—";
+            document.getElementById('monthlySavings').innerText = formatMoney(scenario.monthlySavings);
+            document.getElementById('annualSavings').innerText = formatMoney(scenario.firstYearAnnualSavings);
+            document.getElementById('shiftCoverage').innerText = Math.min(scenario.coveragePercent, 100).toFixed(1);
+            document.getElementById('batteryUnits').innerText = scenario.batteryUnits;
+            document.getElementById('coverageHint').innerText = scenario.batteryUnits === 2
+                ? 'Покриття з 1 АКБ було менше 50%, тому автоматично додано 2-й АКБ.'
+                : '';
+
+            renderChart(scenario.totalInvestment, projection.cumulativeSavingsSeries, projection.labels);
         }
 
-        function renderChart(totalCost, annualSavings) {
+        function buildProjection(totalInvestment, firstYearAnnualSavings, years) {
+            const labels = Array.from({ length: years + 1 }, (_, i) => i + ' р.');
+            const cumulativeSavingsSeries = [0];
+
+            let cumulativeSavings = 0;
+            let paybackYears = null;
+
+            for (let year = 1; year <= years; year += 1) {
+                const yearlySavings = firstYearAnnualSavings;
+                const previousCumulative = cumulativeSavings;
+                cumulativeSavings += yearlySavings;
+                cumulativeSavingsSeries.push(cumulativeSavings);
+
+                if (!paybackYears && yearlySavings > 0 && cumulativeSavings >= totalInvestment) {
+                    const remainingBeforeYear = totalInvestment - previousCumulative;
+                    const fractionOfYear = remainingBeforeYear / yearlySavings;
+                    paybackYears = (year - 1) + fractionOfYear;
+                }
+            }
+
+            return {
+                labels,
+                cumulativeSavingsSeries,
+                paybackYears
+            };
+        }
+
+        function renderChart(totalInvestment, cumulativeSavingsSeries, labels) {
             const ctx = document.getElementById('roiChart').getContext('2d');
-            
-            // Створюємо масив на 15 років для осі X
-            const labels = Array.from({length: 16}, (_, i) => i + ' р.');
-            const costLine = Array(16).fill(totalCost);
-            const savingsLine = Array.from({length: 16}, (_, i) => i * annualSavings);
+            const investmentLine = Array(labels.length).fill(totalInvestment);
+            const netSeries = cumulativeSavingsSeries.map((value) => value - totalInvestment);
 
             if (myChart) {
-                myChart.destroy(); 
+                myChart.destroy();
             }
 
             myChart = new Chart(ctx, {
@@ -119,22 +207,31 @@
                     datasets: [
                         {
                             label: 'Інвестиції (грн)',
-                            data: costLine,
+                            data: investmentLine,
                             borderColor: '#ef4444',
                             borderWidth: 2,
-                            borderDash:, // Виправлено: тепер це масив
+                            borderDash: [6, 6],
                             fill: false,
                             pointRadius: 0
                         },
                         {
                             label: 'Накопичена економія (грн)',
-                            data: savingsLine,
+                            data: cumulativeSavingsSeries,
                             backgroundColor: 'rgba(234, 179, 8, 0.15)',
                             borderColor: '#eab308',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.3,
                             pointBackgroundColor: '#eab308'
+                        },
+                        {
+                            label: 'Баланс (економія - інвестиції), грн',
+                            data: netSeries,
+                            borderColor: '#14b8a6',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3,
+                            pointRadius: 0
                         }
                     ]
                 },
@@ -149,16 +246,15 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' ₴';
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString('uk-UA') + ' грн';
                                 }
                             }
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: true,
                             ticks: {
-                                callback: value => value.toLocaleString() + ' ₴'
+                                callback: (value) => value.toLocaleString('uk-UA') + ' грн'
                             },
                             grid: { color: '#f3f4f6' }
                         },
