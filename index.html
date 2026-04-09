@@ -24,8 +24,8 @@
 
     <div class="max-w-4xl mx-auto p-6">
         <header class="text-center mb-10">
-            <h1 class="text-3xl font-bold text-yellow-600 uppercase tracking-wide">Solar ROI Visualizer</h1>
-            <p class="text-gray-500">Графік повернення інвестицій</p>
+            <h1 class="text-4xl font-extrabold text-yellow-600 tracking-tight">Solar ROI Visualizer</h1>
+            <p class="text-gray-500 mt-2">Інженерний розрахунок повернення інвестицій</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -33,53 +33,69 @@
             <div class="lg:col-span-1 bg-white shadow-xl rounded-2xl p-6 border border-gray-100 h-fit">
                 <div class="grid gap-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Вартість системи ($)</label>
-                        <input type="number" id="cost" value="5000" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500">
+                        <label class="block text-sm font-semibold mb-1">Вартість системи ($)</label>
+                        <input type="number" id="cost" value="5000" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Споживання (кВт·год/міс)</label>
-                        <input type="number" id="consumption" value="300" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500">
+                        <label class="block text-sm font-semibold mb-1">Споживання (кВт·год/міс)</label>
+                        <input type="number" id="consumption" value="300" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Тариф (грн/кВт)</label>
-                        <input type="number" id="tariff" value="4.32" step="0.01" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500">
+                        <label class="block text-sm font-semibold mb-1">Тариф (грн/кВт·год)</label>
+                        <input type="number" id="tariff" value="4.32" step="0.01" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Курс (грн/$)</label>
-                        <input type="number" id="rate" value="40" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500">
+                        <label class="block text-sm font-semibold mb-1">Курс валют (грн/$)</label>
+                        <input type="number" id="rate" value="40" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
                     </div>
-                    <button onclick="updateDashboard()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 rounded-xl transition shadow-lg">
-                        Оновити графік
+                    <button onclick="updateDashboard()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg active:scale-95">
+                        Оновити розрахунок
                     </button>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
-                <div id="result-text" class="mb-6">
-                    <p class="text-xl">Окупність: <span id="years" class="font-bold text-yellow-600">0</span> років</p>
+            <div class="lg:col-span-2 bg-white shadow-xl rounded-2xl p-8 border border-gray-100">
+                <div id="result-text" class="mb-8 border-b pb-4">
+                    <p class="text-gray-500 uppercase text-xs font-bold tracking-widest">Прогноз окупності</p>
+                    <p class="text-4xl font-black text-gray-900"><span id="years">0</span> <span class="text-lg font-medium text-gray-500">років</span></p>
                 </div>
-                <div class="relative h-[300px]">
+                
+                <div class="relative h-[350px]">
                     <canvas id="roiChart"></canvas>
                 </div>
             </div>
 
         </div>
+
+        <footer class="mt-12 text-center text-gray-400 text-sm">
+            <p>© 2026 Trust me, I am an engineer. Побудовано з використанням Chart.js та Tailwind.</p>
+        </footer>
     </div>
 
     <script>
         let myChart = null;
 
         function updateDashboard() {
-            const costUsd = parseFloat(document.getElementById('cost').value);
-            const monthlyKwh = parseFloat(document.getElementById('consumption').value);
-            const tariff = parseFloat(document.getElementById('tariff').value);
-            const rate = parseFloat(document.getElementById('rate').value);
+            // Подія для Google Analytics
+            if (typeof gtag === 'function') {
+                gtag('event', 'calculate_click', {
+                    'event_category': 'engagement',
+                    'event_label': 'Solar Calculation'
+                });
+            }
+
+            // Отримуємо значення з полів
+            const costUsd = parseFloat(document.getElementById('cost').value) || 0;
+            const monthlyKwh = parseFloat(document.getElementById('consumption').value) || 0;
+            const tariff = parseFloat(document.getElementById('tariff').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
 
             const costGrn = costUsd * rate;
             const annualSavings = monthlyKwh * 12 * tariff;
-            const paybackYears = costGrn / annualSavings;
-
-            document.getElementById('years').innerText = paybackYears.toFixed(1);
+            
+            // Розрахунок років окупності
+            const paybackYears = annualSavings > 0 ? (costGrn / annualSavings) : 0;
+            document.getElementById('years').innerText = paybackYears > 0 ? paybackYears.toFixed(1) : "—";
 
             renderChart(costGrn, annualSavings);
         }
@@ -87,35 +103,38 @@
         function renderChart(totalCost, annualSavings) {
             const ctx = document.getElementById('roiChart').getContext('2d');
             
-            // Розрахунок даних на 15 років
-            const labels = Array.from({length: 16}, (_, i) => i); // [0, 1, 2...15]
-            const costLine = labels.map(() => totalCost);
-            const savingsLine = labels.map(year => year * annualSavings);
+            // Створюємо масив на 15 років для осі X
+            const labels = Array.from({length: 16}, (_, i) => i + ' р.');
+            const costLine = Array(16).fill(totalCost);
+            const savingsLine = Array.from({length: 16}, (_, i) => i * annualSavings);
 
             if (myChart) {
-                myChart.destroy(); // Знищуємо старий графік перед створенням нового
+                myChart.destroy(); 
             }
 
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels.map(l => l + ' р.'),
+                    labels: labels,
                     datasets: [
                         {
-                            label: 'Витрати на систему (грн)',
+                            label: 'Інвестиції (грн)',
                             data: costLine,
                             borderColor: '#ef4444',
-                            borderDash:,
+                            borderWidth: 2,
+                            borderDash:, // Виправлено: тепер це масив
                             fill: false,
-                            tension: 0.1
+                            pointRadius: 0
                         },
                         {
                             label: 'Накопичена економія (грн)',
                             data: savingsLine,
-                            backgroundColor: 'rgba(234, 179, 8, 0.2)',
+                            backgroundColor: 'rgba(234, 179, 8, 0.15)',
                             borderColor: '#eab308',
+                            borderWidth: 3,
                             fill: true,
-                            tension: 0.3
+                            tension: 0.3,
+                            pointBackgroundColor: '#eab308'
                         }
                     ]
                 },
@@ -123,22 +142,36 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: { 
+                            position: 'bottom',
+                            labels: { padding: 20, font: { size: 12 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' ₴';
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             ticks: {
                                 callback: value => value.toLocaleString() + ' ₴'
-                            }
-                        }
+                            },
+                            grid: { color: '#f3f4f6' }
+                        },
+                        x: { grid: { display: false } }
                     }
                 }
             });
         }
 
-        // Запуск при завантаженні
-        updateDashboard();
+        // Автоматичний запуск при завантаженні сторінки
+        window.onload = function() {
+            updateDashboard();
+        };
     </script>
 </body>
 </html>
