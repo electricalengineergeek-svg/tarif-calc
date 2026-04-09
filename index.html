@@ -150,7 +150,7 @@
                 scenario = calculateScenario(2);
             }
 
-            const projection = buildProjection(scenario.totalInvestment, scenario.firstYearAnnualSavings, 15);
+            const projection = buildProjection(scenario.totalInvestment, scenario.firstYearAnnualSavings, 30);
 
             document.getElementById('years').innerText = projection.paybackYears ? projection.paybackYears.toFixed(1) : "—";
             document.getElementById('monthlySavings').innerText = formatMoney(scenario.monthlySavings);
