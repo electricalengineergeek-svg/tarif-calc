@@ -19,19 +19,75 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .float-slow {
+            animation: floatUpDown 6s ease-in-out infinite;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<!---->
+<body class="bg-gray-50 text-gray-800 font-sans relative overflow-x-hidden">
+
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+        <div class="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-yellow-200/40 blur-3xl"></div>
+        <div class="absolute top-32 -right-24 h-80 w-80 rounded-full bg-sky-200/35 blur-3xl"></div>
+        <div class="absolute bottom-12 left-1/3 h-64 w-64 rounded-full bg-emerald-200/30 blur-3xl"></div>
+    </div>
 
     <div class="max-w-4xl mx-auto p-6">
         <header class="text-center mb-10">
             <h1 class="text-4xl font-extrabold text-yellow-600 tracking-tight">Hybrid Battery ROI Visualizer</h1>
             <p class="text-gray-500 mt-2">Нічний заряд за дешевим тарифом, денне споживання без мережі</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 text-left">
+                <div class="bg-white/80 backdrop-blur border border-yellow-100 rounded-2xl p-4 shadow-md float-slow">
+                    <div class="flex items-center gap-4">
+                        <svg viewBox="0 0 220 120" class="w-24 h-16 shrink-0" role="img" aria-label="Ілюстрація акумулятора">
+                            <rect x="20" y="22" width="170" height="76" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="4"></rect>
+                            <rect x="192" y="48" width="14" height="24" rx="4" fill="#d97706"></rect>
+                            <rect x="36" y="38" width="140" height="44" rx="8" fill="#fff"></rect>
+                            <path d="M86 48v24M74 60h24" stroke="#16a34a" stroke-width="6" stroke-linecap="round"></path>
+                            <rect x="130" y="52" width="34" height="16" rx="4" fill="#fde68a"></rect>
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-gray-800">Нічний заряд АКБ</p>
+                            <p class="text-xs text-gray-500">АКБ накопичує дешеву енергію вночі для денного використання.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur border border-sky-100 rounded-2xl p-4 shadow-md float-slow" style="animation-delay: 0.8s;">
+                    <div class="flex items-center gap-4">
+                        <svg viewBox="0 0 220 120" class="w-24 h-16 shrink-0" role="img" aria-label="Ілюстрація інвертора">
+                            <rect x="28" y="16" width="164" height="88" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="4"></rect>
+                            <circle cx="72" cy="60" r="18" fill="#fff" stroke="#0369a1" stroke-width="3"></circle>
+                            <path d="M64 60h16M72 52v16" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"></path>
+                            <rect x="104" y="42" width="70" height="12" rx="6" fill="#bae6fd"></rect>
+                            <rect x="104" y="62" width="48" height="12" rx="6" fill="#7dd3fc"></rect>
+                            <path d="M28 104h164" stroke="#0284c7" stroke-width="4" stroke-linecap="round"></path>
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-gray-800">Гібридний інвертор</p>
+                            <p class="text-xs text-gray-500">Інвертор віддає накопичене в АКБ навантаженням у денні години.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <div class="lg:col-span-1 bg-white shadow-xl rounded-2xl p-6 border border-gray-100 h-fit">
                 <div class="grid gap-4">
+                    <div class="rounded-xl border-2 border-amber-300 bg-gradient-to-r from-amber-100 via-yellow-100 to-orange-100 px-4 py-3 text-sm font-semibold text-amber-900 shadow-sm">
+                        <span class="inline-flex items-center gap-2">
+                            <span class="text-base" aria-hidden="true">⚡</span>
+                            Внеси своє місячне споживання і натисни "Оновити розрахунок".
+                        </span>
+                    </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1">Місячне споживання (кВт·год)</label>
                         <input type="number" id="monthlyConsumption" value="300" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
